@@ -101,9 +101,15 @@ The line plot shows transaction trends over time, with peaks indicating bursts o
 
 ### Transaction Network Visualization
 
-Bitcoin transactions can be visualized as a graph where nodes are transactions and edges represent links between them. This graph reveals connectivity patterns, which may help identify fraud rings.
+Bitcoin transactions can be visualized as a graph where nodes are transactions and edges represent links between them. This graph reveals connectivity patterns, which may help identify fraud rings (we take the period of timestep 10 for the visualisation):
 
-**Visualization**:
+**Visualization of illicit ones**:
+![Transaction Network](transaction_network_illicit_filtered.png)
+
+**Visualization of licit ones**:
+![Transaction Network](transaction_network_licit_filtered.png)
+
+**Visualization of both on one**:
 ![Transaction Network](transaction_network.png)
 
 **Code**:
