@@ -2,7 +2,7 @@
 # Fraudulent Bitcoin Transaction Detection Using Graph Machine Learning
 
 ## You can access the code by this link:
-[Open in Google Colab]([https://colab.research.google.com/drive/1BMbZ5AzMVUWKimVWuJHct-Ky1oGjcKbC#scrollTo=MEYHqi2j__0-](https://colab.research.google.com/drive/1dwJLCR0RzRJouRLOxzm5ABOS4KZ-ShpL?usp=sharing))
+[Open in Google Colab]([[https://colab.research.google.com/drive/1BMbZ5AzMVUWKimVWuJHct-Ky1oGjcKbC#scrollTo=MEYHqi2j__0-](https://colab.research.google.com/drive/1dwJLCR0RzRJouRLOxzm5ABOS4KZ-ShpL?usp=sharing)](https://colab.research.google.com/drive/1dwJLCR0RzRJouRLOxzm5ABOS4KZ-ShpL?usp=sharing))
 
 
 ## Objective
