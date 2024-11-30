@@ -43,9 +43,11 @@ This project leverages Graph Machine Learning techniques to detect fraudulent Bi
    G = nx.from_pandas_edgelist(edges_df, source='txId1', target='txId2')
    ```
 
-   **Visualization**:
+   **Visualization of illicit**:
    ![Transaction Network (Illicit)](transaction_network_illicit_filtered.png)
+   **Visualization of licit**:
    ![Transaction Network (Licit)](transaction_network_licit_filtered.png)
+   **Visualization of both**:
    ![Transaction Network (Combined)](transaction_network.png)
 
 ---
