@@ -62,12 +62,12 @@ GraphSAGE generates embeddings by aggregating node features and those of their n
 $$
 h_v^{(k)} = \sigma(W^{(k)} \cdot \text{AGGREGATE}(\{ h_u^{(k-1)}, \forall u \in \mathcal{N}(v) \}))
 $$
-
 Where:
-- ![h_v^{(k)}](https://latex.codecogs.com/png.latex?%5Ccolor%7Bblue%7Dh_v%5E%7B%28k%29%7D) is the embedding of node \( v \) at layer \( k \).
+- ![h_v^{(k)}](https://latex.codecogs.com/png.latex?%5Ccolor%7Bgreen%7Dh_v%5E%7B%28k%29%7D) is the embedding of node \( v \) at layer \( k \).
 - ![\mathcal{N}(v)](https://latex.codecogs.com/png.latex?%5Ccolor%7Bgreen%7D%5Cmathcal%7BN%7D%28v%29) represents the neighbors of node \( v \).
-- ![\sigma](https://latex.codecogs.com/png.latex?%5Ccolor%7Bred%7D%5Csigma) is a non-linear activation function.
-- ![W^{(k)}](https://latex.codecogs.com/png.latex?%5Ccolor%7Bpurple%7DW%5E%7B%28k%29%7D) are trainable weights at layer \( k \).
+- ![\sigma](https://latex.codecogs.com/png.latex?%5Ccolor%7Bgreen%7D%5Csigma) is a non-linear activation function.
+- ![W^{(k)}](https://latex.codecogs.com/png.latex?%5Ccolor%7Bgreen%7DW%5E%7B%28k%29%7D) are trainable weights at layer \( k \).
+
 
 
 
