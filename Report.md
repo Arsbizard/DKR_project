@@ -122,7 +122,14 @@ GraphSAGE generates embeddings by aggregating node features and those of their n
 ---
 
 ### 4. Evaluation
-Evaluate the model's performance on the test set using metrics like accuracy, precision, and recall.
+
+Here you can see the results of the work of the model (how it predicts the classes):
+![Predicted_classes](predicted_class_distribution.png)
+
+
+We evaluated the model's performance on the test set using F1 metric:
+![Performance](f1_losses.png)
+
 
 ---
 
@@ -150,11 +157,11 @@ Evaluate the model's performance on the test set using metrics like accuracy, pr
 
 ### 6. Node Embeddings
    - Visualizes learned node embeddings to reveal separations between classes.
-   ![Node Embedding Visualization](node_embeddings.png)
+   ![Node Embedding Visualization](node_embedding_visualization.png)
 
 ### 7. Prediction Scores Heatmap
    - Displays model confidence in classifying transactions.
-   ![Prediction Scores Heatmap](prediction_heatmap.png)
+   ![Prediction Scores Heatmap](class_probabilities_heatmap.png)
 
 ---
 
