@@ -1,253 +1,165 @@
 
-# Fraudulent Bitcoin Transaction Detection Using Graph Machine Learning Techniques
+# Fraudulent Bitcoin Transaction Detection Using Graph Machine Learning
 
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [Dataset Overview](#dataset-overview)
-    - [Transaction Class Distribution](#transaction-class-distribution)
-    - [Temporal Analysis](#temporal-analysis)
-3. [Graph Structure Analysis](#graph-structure-analysis)
-    - [Transaction Network Visualization](#transaction-network-visualization)
-    - [Node Degree Distribution](#node-degree-distribution)
-4. [Feature Analysis](#feature-analysis)
-    - [Feature Correlation Heatmap](#feature-correlation-heatmap)
-    - [PCA of Features](#pca-of-features)
-5. [GraphSAGE Model](#graphsage-model)
-    - [Model Workflow](#model-workflow)
-    - [Layer Aggregation](#layer-aggregation)
-6. [Results and Analysis](#results-and-analysis)
-    - [Node Embedding Visualization](#node-embedding-visualization)
-    - [Prediction Scores Heatmap](#prediction-scores-heatmap)
-7. [Conclusion and Future Work](#conclusion-and-future-work)
+## Objective
+This project leverages Graph Machine Learning techniques to detect fraudulent Bitcoin transactions. It utilizes the GraphSAGE algorithm to identify illicit activity in a transaction network.
 
 ---
 
-## Introduction
+## Core Workflow
 
-Bitcoin has revolutionized the financial sector by introducing decentralized digital transactions. However, it has also become a target for fraudulent activities, such as money laundering and illegal trades. Detecting fraudulent transactions in a Bitcoin network poses unique challenges due to its anonymous and decentralized nature.
+1. **Data Preprocessing**:
+   - Combine transaction and feature datasets to construct a directed graph where nodes represent transactions and edges represent transaction relationships.
+   - Normalize features to standardize the data for machine learning.
 
-This project addresses these challenges by leveraging Graph Machine Learning (ML) techniques, particularly the GraphSAGE model, to classify transactions as licit or illicit. By utilizing graph structures and node features, the project provides a robust way to identify suspicious activity in transaction networks.
+2. **Graph Construction**:
+   - Nodes: Represent individual Bitcoin transactions.
+   - Edges: Represent directed relationships between transactions.
+   - Features: Each node contains 165 features (e.g., transaction value, time, and other graph-theoretic metrics).
 
----
-
-## Dataset Overview
-
-The Elliptic Bitcoin Dataset forms the backbone of this project. It consists of over 200,000 Bitcoin transactions represented as a directed graph. Each transaction is labeled as:
-- **Licit**: Normal transactions.
-- **Illicit**: Fraudulent transactions.
-- **Unknown**: Transactions with no label.
-
----
-
-### Transaction Class Distribution
-
-Analyzing the class distribution is the first step in understanding the dataset. An imbalanced dataset can pose challenges for model performance and requires careful handling.
-
-**Visualization**:
-![Transaction Class Distribution](class_distribution.png)
-
-**Code**:
-```python
-# Load and analyze class distribution
-import pandas as pd
-import matplotlib.pyplot as plt
-
-classes_df = pd.read_csv('elliptic_txs_classes.csv')
-class_counts = classes_df['class'].value_counts()
-
-# Visualize class distribution
-plt.figure(figsize=(8, 6))
-plt.pie(class_counts, labels=class_counts.index, autopct='%1.1f%%', startangle=140)
-plt.title("Transaction Class Distribution")
-plt.show()
-```
-
-**Explanation**:
-This pie chart visualizes the proportions of licit, illicit, and unknown transactions. The imbalance in class labels highlights the challenge of identifying fraudulent transactions within a sea of legitimate activity.
+3. **GraphSAGE Algorithm**:
+   - **Idea**: Aggregate features from neighboring nodes to learn embeddings for each node.
+   - **Steps**:
+     - Sample neighbors for each node.
+     - Aggregate features of sampled neighbors.
+     - Combine aggregated features with the node's own features.
+   - **Training**: Use labeled nodes (licit or illicit) to train the model and optimize the embeddings.
+   - **Output**: Trained embeddings that encode structural and feature information, aiding in transaction classification.
 
 ---
 
-### Temporal Analysis
+## Key Algorithmic Steps
 
-Temporal analysis reveals how transactions occur over time. Fraudulent transactions may exhibit bursts or spikes at specific intervals.
+### 1. Graph Construction
+   - Read transaction and edge data.
+   - Build a graph using NetworkX, where:
+     - Nodes are transaction IDs.
+     - Edges define relationships between transactions.
 
-**Visualization**:
-![Temporal Analysis](temporal_analysis.png)
+   ```python
+   import networkx as nx
 
-**Code**:
-```python
-# Analyze temporal trends
-features_df = pd.read_csv('elliptic_txs_features.csv', header=None)
-features_df = features_df.rename(columns={0: 'tx_id', 1: 'time_step'})
-merged_df = pd.merge(features_df[['tx_id', 'time_step']], classes_df, left_on='tx_id', right_on='txId')
+   edges_df = pd.read_csv('elliptic_txs_edgelist.csv')
+   G = nx.from_pandas_edgelist(edges_df, source='txId1', target='txId2')
+   ```
 
-# Group by time step and visualize
-time_class_counts = merged_df.groupby(['time_step', 'class']).size().unstack(fill_value=0)
-time_class_counts.plot(kind='line', figsize=(12, 6))
-plt.title('Number of Transactions Over Time by Class')
-plt.xlabel('Time Step')
-plt.ylabel('Number of Transactions')
-plt.legend(title='Class')
-plt.show()
-```
-
-**Explanation**:
-The line plot shows transaction trends over time, with peaks indicating bursts of illicit activity. This analysis is crucial for identifying patterns and unusual behaviors in the data.
+   **Visualization**:
+   ![Transaction Network (Illicit)](transaction_network_illicit_filtered.png)
+   ![Transaction Network (Licit)](transaction_network_licit_filtered.png)
+   ![Transaction Network (Combined)](transaction_network.png)
 
 ---
 
-## Graph Structure Analysis
+### 2. Feature Aggregation
+GraphSAGE generates embeddings by aggregating node features and those of their neighbors. The model uses the following workflow:
+   - **Layer 1**: Aggregate features from immediate neighbors.
+   - **Layer 2**: Aggregate features from the neighbors' neighbors.
+   - **Combine**: Combine aggregated features to create final embeddings.
 
-### Transaction Network Visualization
+   **Formula**:
+   \[
+   h_v^{(k)} = \sigma(W^{(k)} \cdot 	ext{AGGREGATE}(\{ h_u^{(k-1)}, orall u \in \mathcal{N}(v) \}))
+   \]
+   Where:
+   - \( h_v^{(k)} \) is the embedding of node \( v \) at layer \( k \).
+   - \( \mathcal{N}(v) \) represents the neighbors of node \( v \).
+   - \( \sigma \) is a non-linear activation function.
+   - \( W^{(k)} \) are trainable weights at layer \( k \).
 
-Bitcoin transactions can be visualized as a graph where nodes are transactions and edges represent links between them. This graph reveals connectivity patterns, which may help identify fraud rings (we take the period of timestep 10 for the visualisation):
+   **Code Example**:
+   ```python
+   import torch
+   import torch.nn as nn
+   from torch_geometric.nn import SAGEConv
 
-**Visualization of illicit ones**:
-![Transaction Network](transaction_network_illicit_filtered.png)
+   class GraphSAGENet(nn.Module):
+       def __init__(self, input_dim, hidden_dim, output_dim):
+           super(GraphSAGENet, self).__init__()
+           self.conv1 = SAGEConv(input_dim, hidden_dim)
+           self.conv2 = SAGEConv(hidden_dim, output_dim)
 
-**Visualization of licit ones**:
-![Transaction Network](transaction_network_licit_filtered.png)
-
-**Visualization of both on one**:
-![Transaction Network](transaction_network.png)
-
-**Code**:
-```python
-import networkx as nx
-
-# Create and visualize the transaction graph
-edges_df = pd.read_csv('elliptic_txs_edgelist.csv')
-G = nx.from_pandas_edgelist(edges_df, source='txId1', target='txId2')
-
-plt.figure(figsize=(12, 12))
-nx.draw(G, node_color="lightblue", node_size=10, alpha=0.7)
-plt.title("Transaction Network")
-plt.show()
-```
-
-**Explanation**:
-The network graph highlights clusters of connected transactions. Dense clusters may represent fraud rings or legitimate hubs.
-
----
-
-### Node Degree Distribution
-
-The degree of a node indicates its level of connectivity. Unusually high-degree nodes may represent central hubs in the transaction network.
-
-**Visualization**:
-![Node Degree Distribution](degree_distribution.png)
-
-**Code**:
-```python
-# Calculate and visualize node degrees
-degrees = [val for (node, val) in G.degree()]
-plt.figure(figsize=(8, 6))
-plt.hist(degrees, bins=50, color='blue', alpha=0.7)
-plt.title("Node Degree Distribution")
-plt.xlabel("Degree")
-plt.ylabel("Frequency")
-plt.yscale('log')
-plt.show()
-```
-
-**Explanation**:
-The histogram shows the degree distribution, with most nodes having low degrees. Nodes with high degrees may indicate central roles in the network.
+       def forward(self, x, edge_index):
+           x = self.conv1(x, edge_index)
+           x = torch.relu(x)
+           x = self.conv2(x, edge_index)
+           return x
+   ```
 
 ---
 
-## Feature Analysis
+### 3. Model Training
+   - **Objective**: Classify nodes into licit or illicit using embeddings.
+   - **Loss Function**: Binary Cross-Entropy (BCE).
+   - **Optimizer**: Adam.
+   - **Training Data**: Split labeled nodes into training and testing sets.
 
-### Feature Correlation Heatmap
+   **Training Code**:
+   ```python
+   from torch_geometric.data import Data
+   from sklearn.model_selection import train_test_split
 
-**Visualization**:
-![Feature Correlation Heatmap](correlation_heatmap.png)
+   # Create graph data object
+   graph_data = Data(x=features, edge_index=edge_indices, y=labels)
 
-**Code**:
-```python
-import seaborn as sns
+   # Train/test split
+   train_mask, test_mask = train_test_split(range(len(labels)), test_size=0.2)
 
-# Compute and visualize feature correlations
-corr_matrix = features_df.iloc[:, 2:].corr()
-plt.figure(figsize=(12, 10))
-sns.heatmap(corr_matrix, cmap='coolwarm', vmin=-1, vmax=1)
-plt.title("Feature Correlation Heatmap")
-plt.show()
-```
+   model = GraphSAGENet(input_dim=165, hidden_dim=64, output_dim=1)
+   optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
-**Explanation**:
-The heatmap shows relationships between features. Strong correlations may indicate redundancy, while weak correlations suggest unique information for classification.
-
----
-
-### PCA of Features
-
-**Visualization**:
-![PCA of Features](pca_scatter.png)
-
-**Code**:
-```python
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-
-# Apply PCA and visualize
-features_scaled = StandardScaler().fit_transform(features_df.iloc[:, 2:])
-pca = PCA(n_components=2)
-principal_components = pca.fit_transform(features_scaled)
-pca_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
-pca_df['class'] = classes_df['class']
-
-sns.scatterplot(data=pca_df, x='PC1', y='PC2', hue='class', palette="deep")
-plt.title("PCA of Features")
-plt.show()
-```
-
-**Explanation**:
-The PCA plot reduces the dimensionality of features to 2D, making it easier to visualize clusters of transactions. Clear separations suggest the features are effective for classification.
+   # Training loop
+   for epoch in range(epochs):
+       model.train()
+       optimizer.zero_grad()
+       out = model(graph_data.x, graph_data.edge_index)
+       loss = nn.BCEWithLogitsLoss()(out[train_mask], graph_data.y[train_mask])
+       loss.backward()
+       optimizer.step()
+   ```
 
 ---
 
-## Results and Analysis
-
-### Node Embedding Visualization
-
-Node embeddings generated by GraphSAGE can be visualized to show separations between licit and illicit transactions.
-
-**Visualization**:
-![Node Embedding Visualization](node_embeddings.png)
-
-**Code**:
-```python
-# Visualize embeddings in 2D
-pca = PCA(n_components=2)
-reduced_embeddings = pca.fit_transform(node_embeddings)
-plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=labels, cmap="coolwarm", alpha=0.6)
-plt.title("2D Node Embeddings")
-plt.show()
-```
+### 4. Evaluation
+Evaluate the model's performance on the test set using metrics like accuracy, precision, and recall.
 
 ---
 
-### Prediction Scores Heatmap
+## Key Visualizations
 
-The heatmap of prediction scores provides insights into the model's confidence in classifying each transaction.
+### 1. Transaction Class Distribution
+   - Displays the proportion of licit, illicit, and unknown transactions.
+   ![Transaction Class Distribution](class_distribution.png)
 
-**Visualization**:
-![Prediction Scores Heatmap](prediction_heatmap.png)
+### 2. Temporal Analysis
+   - Highlights transaction trends over time.
+   ![Temporal Analysis](temporal_analysis.png)
 
-**Code**:
-```python
-# Simulate and visualize prediction scores
-sns.heatmap([node_scores], cmap="coolwarm", xticklabels=False)
-plt.title("Prediction Scores Heatmap")
-plt.show()
-```
+### 3. Node Degree Distribution
+   - Examines connectivity levels within the transaction graph.
+   ![Node Degree Distribution](degree_distribution.png)
+
+### 4. Feature Correlation Heatmap
+   - Analyzes relationships between features.
+   ![Feature Correlation Heatmap](correlation_heatmap.png)
+
+### 5. PCA of Features
+   - Reduces high-dimensional features to 2D for easier visualization.
+   ![PCA of Features](pca_scatter.png)
+
+### 6. Node Embeddings
+   - Visualizes learned node embeddings to reveal separations between classes.
+   ![Node Embedding Visualization](node_embeddings.png)
+
+### 7. Prediction Scores Heatmap
+   - Displays model confidence in classifying transactions.
+   ![Prediction Scores Heatmap](prediction_heatmap.png)
 
 ---
 
-## Conclusion and Future Work
+## Conclusions
+This framework demonstrates the potential of Graph Machine Learning techniques in detecting illicit Bitcoin transactions. The GraphSAGE model effectively learns from graph structures and node features, offering a scalable and robust approach.
 
-This project demonstrates the effectiveness of Graph Machine Learning techniques, specifically GraphSAGE, for detecting fraudulent Bitcoin transactions. Future work could focus on:
-- Expanding the dataset to improve generalization.
-- Incorporating explainability methods for regulatory compliance.
-- Adapting the model for real-time fraud detection.
+### Future Work
+- Incorporating more transaction metadata for richer features.
+- Real-time deployment to flag suspicious transactions dynamically.
+- Applying explainability techniques to interpret model predictions.
