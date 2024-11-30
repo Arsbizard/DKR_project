@@ -1,6 +1,10 @@
 
 # Fraudulent Bitcoin Transaction Detection Using Graph Machine Learning
 
+## You can access the code by this link:
+[Open in Google Colab](https://colab.research.google.com/drive/1BMbZ5AzMVUWKimVWuJHct-Ky1oGjcKbC#scrollTo=MEYHqi2j__0-)
+
+
 ## Objective
 This project leverages Graph Machine Learning techniques to detect fraudulent Bitcoin transactions. It utilizes the GraphSAGE algorithm to identify illicit activity in a transaction network.
 
