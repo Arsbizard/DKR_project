@@ -58,15 +58,16 @@ GraphSAGE generates embeddings by aggregating node features and those of their n
    - **Layer 2**: Aggregate features from the neighbors' neighbors.
    - **Combine**: Combine aggregated features to create final embeddings.
 
-   **Formula**:
-   \[
-   h_v^{(k)} = \sigma(W^{(k)} \cdot 	ext{AGGREGATE}(\{ h_u^{(k-1)}, orall u \in \mathcal{N}(v) \}))
-   \]
-   Where:
-   - \( h_v^{(k)} \) is the embedding of node \( v \) at layer \( k \).
-   - \( \mathcal{N}(v) \) represents the neighbors of node \( v \).
-   - \( \sigma \) is a non-linear activation function.
-   - \( W^{(k)} \) are trainable weights at layer \( k \).
+### Formula
+$$
+h_v^{(k)} = \sigma(W^{(k)} \cdot \text{AGGREGATE}(\{ h_u^{(k-1)}, \forall u \in \mathcal{N}(v) \}))
+$$
+
+Where:
+- \( h_v^{(k)} \) is the embedding of node \( v \) at layer \( k \).
+- \( \mathcal{N}(v) \) represents the neighbors of node \( v \).
+- \( \sigma \) is a non-linear activation function.
+- \( W^{(k)} \) are trainable weights at layer \( k \).
 
    **Code Example**:
    ```python
