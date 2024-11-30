@@ -59,9 +59,11 @@ GraphSAGE generates embeddings by aggregating node features and those of their n
    - **Combine**: Combine aggregated features to create final embeddings.
 
 ### Formula
+
 $$
 h_v^{(k)} = \sigma(W^{(k)} \cdot \text{AGGREGATE}(\{ h_u^{(k-1)}, \forall u \in \mathcal{N}(v) \}))
 $$
+
 Where:
 - ![h_v^{(k)}](https://latex.codecogs.com/png.latex?%5Ccolor%7Bgreen%7Dh_v%5E%7B%28k%29%7D) is the embedding of node \( v \) at layer \( k \).
 - ![\mathcal{N}(v)](https://latex.codecogs.com/png.latex?%5Ccolor%7Bgreen%7D%5Cmathcal%7BN%7D%28v%29) represents the neighbors of node \( v \).
