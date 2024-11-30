@@ -64,10 +64,11 @@ h_v^{(k)} = \sigma(W^{(k)} \cdot \text{AGGREGATE}(\{ h_u^{(k-1)}, \forall u \in 
 $$
 
 Where:
-- \( h_v^{(k)} \) is the embedding of node \( v \) at layer \( k \).
-- \( \mathcal{N}(v) \) represents the neighbors of node \( v \).
-- \( \sigma \) is a non-linear activation function.
-- \( W^{(k)} \) are trainable weights at layer \( k \).
+- `h_v^{(k)}` is the embedding of node `v` at layer `k`.
+- `\mathcal{N}(v)` represents the neighbors of node `v`.
+- `\sigma` is a non-linear activation function.
+- `W^{(k)}` are trainable weights at layer `k`.
+
 
    **Code Example**:
    ```python
