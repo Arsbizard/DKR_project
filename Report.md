@@ -123,7 +123,7 @@ GraphSAGE generates embeddings by aggregating node features and those of their n
 
 ### 4. Evaluation
 
-Here you can see the results of the work of the model (how it predicts the classes):
+Here you can see the results of the work of the model (how many of each of the classes it predicts):
 ![Predicted_classes](predicted_class_distribution.png)
 
 
